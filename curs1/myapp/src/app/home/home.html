@@ -1,0 +1,8 @@
+<p>home works!</p>
+<p>Aceasta este o descirere: {{descriere}}</p>
+<p>{{ showImage }}</p>
+<img *ngIf="showImage" [src]="myimg" alt="">
+<h3>Formular schimba descriere</h3>
+<input type="text" [(ngModel)]='descriere'>
+<button (click)=salut()> Start </button>
+<button (click)=showImg()> Afiseaza Imagine </button>
