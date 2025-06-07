@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AdminComponent } from '../app/admin/admin';
 import { HomeComponent } from './home/home.component';
 import { ProfilComponent } from './profil/profil.component';
+import { Errorpage } from './errorpage/errorpage';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,6 @@ export const routes: Routes = [
       description: 'Profil user info',
     },
   },
-  { path: '**', component: HomeComponent }, // Wildcard route for a 404 page
+  { path: '**', component: Errorpage }, // Wildcard route for a 404 page
 ];
 
