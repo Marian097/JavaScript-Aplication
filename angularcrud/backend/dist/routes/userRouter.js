@@ -50,6 +50,7 @@ const express_1 = __importDefault(require("express"));
 const bodyParser = __importStar(require("body-parser"));
 const userModel = __importStar(require("../models/user"));
 const path_1 = __importDefault(require("path"));
+const sharp_1 = __importDefault(require("sharp"));
 const userRouter = express_1.default.Router();
 exports.userRouter = userRouter;
 var jsonParser = bodyParser.json();
@@ -78,7 +79,9 @@ userRouter.post("/", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0,
     fileToUplad = req.files.poza;
     const newFileName = `${Date.now()}-_${fileToUplad.name}`;
     uploadPath = path_1.default.join(__dirname, "..", "/uploads/", newFileName);
-    fileToUplad.mv(uploadPath);
+    yield (0, sharp_1.default)(fileToUplad.data)
+        .resize({ width: 300, })
+        .toFile(uploadPath);
     const newUser = req.body;
     newUser["poza"] = newFileName;
     userModel.create(newUser, (err, userId) => {
@@ -89,37 +92,35 @@ userRouter.post("/", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0,
     });
 }));
 // Edit user
-userRouter.put("/:id", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+userRouter.put("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let fileToUplad;
     let uploadPath;
-    fileToUplad = req.files.poza;
-    const newFileName = `${Date.now()}-_${fileToUplad.name}`;
-    uploadPath = path_1.default.join(__dirname, "..", "/uploads/", newFileName);
-    fileToUplad.mv(uploadPath);
+    if (req.files && req.files.poza) {
+        fileToUplad = req.files.poza;
+        const newFileName = `${Date.now()}-_${fileToUplad.name}`;
+        uploadPath = path_1.default.join(__dirname, "..", "/uploads/", newFileName);
+        yield (0, sharp_1.default)(fileToUplad.data)
+            .resize({ width: 300 })
+            .toFile(uploadPath);
+        req.body.poza = newFileName;
+    }
     const user = req.body;
-    user["poza"] = newFileName;
-    console.log(req.body);
+    user.id = Number(req.params.id); // 🟢 FIX: adaugă ID-ul userului
+    console.log("User primit pentru update:", user);
     userModel.update(user, (err) => {
         if (err) {
-            return res.status(500).json({ "message": err.message });
+            return res.status(500).json({ message: err.message });
         }
-        // res.status(200).send();
-        res.status(200).json({
-            "message": 'success'
-        });
+        res.status(200).json({ message: "success" });
     });
 }));
 // Delete user
-userRouter.delete("/:id", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = req.body;
-    console.log(req.body);
-    userModel.deleteUser(user, (err) => {
+userRouter.delete("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = Number(req.params.id);
+    userModel.deleteUser({ id: userId }, (err) => {
         if (err) {
-            return res.status(500).json({ "message": err.message });
+            return res.status(500).json({ message: err.message });
         }
-        // res.status(200).send();
-        res.status(200).json({
-            "message": 'success'
-        });
+        res.status(200).json({ message: 'success' });
     });
 }));

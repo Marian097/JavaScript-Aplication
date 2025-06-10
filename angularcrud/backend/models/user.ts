@@ -77,7 +77,7 @@ export const create = (user: User, callback: Function) => {
 
 // update user
 export const update = (user: User, callback: Function) => {
-  const queryString = `UPDATE jsusers SET nume=?, prenume=?, telefon=?, cnp=?, poza=?,adresa=?  WHERE id=?`;
+  const queryString = `UPDATE jsusers SET nume=?, prenume=?, telefon=?, cnp=?, poza=?, adresa=?  WHERE id=?`;
 
   db.query(queryString, [user.nume, user.prenume, user.telefon, user.cnp, user.poza, user.adresa, user.id], (err, result) => {
     if (err) {

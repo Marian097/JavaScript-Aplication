@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf, NgFor, formatDate, NgOptimizedImage } from '@angular/common';
 import { User } from './../models/user';
 import { ApiService } from '../api';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
+
 
 @Component({
   selector: 'app-admin',
@@ -20,7 +21,7 @@ export class AdminComponent implements OnInit {
     nume: '',
     prenume: '',
     email: '',
-    datanastere: new Date(),
+    datanastere: '',
     telefon: '',
     poza: '',
   };
@@ -29,7 +30,8 @@ export class AdminComponent implements OnInit {
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.readUsers();
+    this.readUsers()
+    
   }
   readUsers() {
     // read
@@ -63,7 +65,7 @@ export class AdminComponent implements OnInit {
     formData.append('telefon', this.selectedUser.telefon);
     formData.append(
       'datanastere',
-      this.selectedUser.datanastere?.toString() || ''
+      this.selectedUser.datanastere?.toString() || ""
     );
     if (this.selectedFile) {
       formData.append('poza', this.selectedFile);
@@ -84,7 +86,11 @@ export class AdminComponent implements OnInit {
   }
 
   selectUser(user: User) {
-    this.selectedUser = user;
+    this.selectedUser = {
+      ...user, 
+      datanastere: formatDate(user.datanastere, "yyyy-MM-dd", "en-US")
+    }
+
   }
 
   deleteUser(id: number) {

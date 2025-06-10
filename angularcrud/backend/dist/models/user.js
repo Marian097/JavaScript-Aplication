@@ -70,7 +70,7 @@ const create = (user, callback) => {
 exports.create = create;
 // update user
 const update = (user, callback) => {
-    const queryString = `UPDATE jsusers SET nume=?, prenume=?, telefon=?, cnp=?, poza=?,adresa=?  WHERE id=?`;
+    const queryString = `UPDATE jsusers SET nume=?, prenume=?, telefon=?, cnp=?, poza=?, adresa=?  WHERE id=?`;
     db_1.db.query(queryString, [user.nume, user.prenume, user.telefon, user.cnp, user.poza, user.adresa, user.id], (err, result) => {
         if (err) {
             callback(err);

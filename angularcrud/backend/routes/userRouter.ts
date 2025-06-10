@@ -4,6 +4,10 @@ import * as userModel from "../models/user";
 import {User} from "../types/User";
 import { UploadedFile } from "express-fileupload";
 import path from "path";
+import sharp from "sharp";
+
+
+
 
 const userRouter = express.Router();
 var jsonParser = bodyParser.json()
@@ -37,7 +41,10 @@ userRouter.post("/",jsonParser, async (req: Request, res: Response) => {
   fileToUplad = req.files!.poza as UploadedFile;
   const newFileName = `${Date.now()}-_${fileToUplad.name}`
   uploadPath = path.join(__dirname, "..", "/uploads/", newFileName)
-  fileToUplad.mv(uploadPath);
+  await sharp(fileToUplad.data)
+  .resize({width: 300,})
+  .toFile(uploadPath)
+
 
   const newUser: User = req.body;
   newUser["poza"] = newFileName;
@@ -51,43 +58,45 @@ userRouter.post("/",jsonParser, async (req: Request, res: Response) => {
 });
 
 // Edit user
-userRouter.put("/:id",jsonParser, async (req: Request, res: Response) => {
-  let fileToUplad:any;
+userRouter.put("/:id", async (req: Request, res: Response) => {
+  let fileToUplad: any;
   let uploadPath;
-  fileToUplad = req.files!.poza as UploadedFile;
-  const newFileName = `${Date.now()}-_${fileToUplad.name}`
-  uploadPath = path.join(__dirname, "..", "/uploads/", newFileName)
-  fileToUplad.mv(uploadPath);
-  
-  
+
+  if (req.files && req.files.poza) {
+    fileToUplad = req.files.poza as UploadedFile;
+    const newFileName = `${Date.now()}-_${fileToUplad.name}`;
+    uploadPath = path.join(__dirname, "..", "/uploads/", newFileName);
+
+    await sharp(fileToUplad.data)
+      .resize({ width: 300 })
+      .toFile(uploadPath);
+
+    req.body.poza = newFileName;
+  }
+
   const user: User = req.body;
-  user["poza"] = newFileName;
-  
-  console.log(req.body);
+  user.id = Number(req.params.id); // 🟢 FIX: adaugă ID-ul userului
+
+  console.log("User primit pentru update:", user);
+
   userModel.update(user, (err: Error) => {
     if (err) {
-      return res.status(500).json({"message": err.message});
+      return res.status(500).json({ message: err.message });
     }
 
-    // res.status(200).send();
-    res.status(200).json({
-      "message": 'success'
-      });
-  })
+    res.status(200).json({ message: "success" });
+  });
 });
+
 // Delete user
-userRouter.delete("/:id",jsonParser, async (req: Request, res: Response) => {
-  const user: User = req.body;
-  console.log(req.body);
-  userModel.deleteUser(user, (err: Error) => {
+userRouter.delete("/:id", async (req: Request, res: Response) => {
+  const userId = Number(req.params.id);
+  userModel.deleteUser({ id: userId } as User, (err: Error) => {
     if (err) {
-      return res.status(500).json({"message": err.message});
+      return res.status(500).json({ message: err.message });
     }
-
-    // res.status(200).send();
-    res.status(200).json({
-      "message": 'success'
-      });
-  })
+    res.status(200).json({ message: 'success' });
+  });
 });
+
 export {userRouter};

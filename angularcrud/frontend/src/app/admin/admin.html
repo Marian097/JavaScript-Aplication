@@ -82,7 +82,7 @@
                 <td>{{ user.nume }}</td>
                 <td>{{ user.prenume }}</td>
                 <td>{{ user.email }}</td>
-                <td><img [src]="apiUrl+'/uploads/' + user.poza" [style.width.px]="widthImg"></td>
+                <td><img [src]="apiUrl+'/uploads/' + user.poza" [style.width.px]="widthImg" loading="eager"></td>
                 <td>
                     <button type="button" class="btn btn-primary" (click)="deleteUser(user.id)">Delete</button>
                     <button type="button" class="btn btn-danger" (click)="selectUser(user)">Update</button>

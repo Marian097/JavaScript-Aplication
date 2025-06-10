@@ -5,6 +5,7 @@ import {userRouter} from "./routes/userRouter";
 import cors from 'cors';
 import path from 'path';
 import fileUpload from "express-fileupload";
+import sharp  from "sharp";
 
 
 
